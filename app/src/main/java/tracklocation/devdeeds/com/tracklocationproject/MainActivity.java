@@ -166,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
             mMsgView.setText(R.string.msg_location_service_started);
 
             //Start location sharing service to app server.........
+
             Intent intent = new Intent(this, LocationMonitoringService.class);
             startService(intent);
 
@@ -315,8 +316,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Stop location sharing service to app server.........
 
-        stopService(new Intent(this, LocationMonitoringService.class));
-        mAlreadyStartedService = false;
+        /*stopService(new Intent(this, LocationMonitoringService.class));
+        mAlreadyStartedService = false;*/
         //Ends................................................
 
 

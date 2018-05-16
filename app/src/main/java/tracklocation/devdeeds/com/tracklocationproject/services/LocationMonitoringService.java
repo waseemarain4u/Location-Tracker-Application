@@ -1,7 +1,9 @@
 package tracklocation.devdeeds.com.tracklocationproject.services;
 
 import android.Manifest;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -9,8 +11,10 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -18,6 +22,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import tracklocation.devdeeds.com.tracklocationproject.R;
 import tracklocation.devdeeds.com.tracklocationproject.settings.Constants;
 
 
@@ -54,7 +59,6 @@ public class LocationMonitoringService extends Service implements
 
         int priority = LocationRequest.PRIORITY_HIGH_ACCURACY; //by default
         //PRIORITY_BALANCED_POWER_ACCURACY, PRIORITY_LOW_POWER, PRIORITY_NO_POWER are the other priority modes
-
 
         mLocationRequest.setPriority(priority);
         mLocationClient.connect();
@@ -114,19 +118,19 @@ public class LocationMonitoringService extends Service implements
 
             //Send result to activities
             sendMessageToUI(String.valueOf(location.getLatitude()), String.valueOf(location.getLongitude()));
+
         }
 
     }
 
     private void sendMessageToUI(String lat, String lng) {
-
         Log.d(TAG, "Sending info...");
-
         Intent intent = new Intent(ACTION_LOCATION_BROADCAST);
         intent.putExtra(EXTRA_LATITUDE, lat);
         intent.putExtra(EXTRA_LONGITUDE, lng);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-
+        Toast.makeText(this,lat+":"+lng,Toast.LENGTH_SHORT).show();
+        addNotification(lat+":"+lng);
     }
 
 
@@ -134,6 +138,23 @@ public class LocationMonitoringService extends Service implements
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.d(TAG, "Failed to connect to Google API");
 
+    }
+
+    private void addNotification(String latLng ) {
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("Notifications Example")
+                        .setContentText(latLng);
+
+        /*Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);*/
+
+        // Add as notification
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(0, builder.build());
     }
 
 
